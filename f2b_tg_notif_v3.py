@@ -81,7 +81,7 @@ def send_alert(token, chatid):
 # Send static message if the current EUR price is lower that the minimum and the average
 
 	bot.sendMessage(chat_id=ID, parse_mode='Markdown', text='The IP *%s* has just been banned by ' \
-			                                 			'Fail2ban after *%d* attempts against *%s*.\n' \
-														'*IP info:*\n\n%s' % (ip, failed, name, info))
+			                                 	'Fail2ban after *%d* attempts against *%s*.\n' \
+								'*IP info:*\n\n%s' % (ip, failed, name, info))
 
 send_alert(token, chatid)
