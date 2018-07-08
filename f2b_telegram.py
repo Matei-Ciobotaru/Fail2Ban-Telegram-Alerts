@@ -47,10 +47,11 @@ failed = args.failures[0]
 
 host = gethostname().upper()
 
-# IntruderAlertBot details 
+# Telegram bot details, add your token & chatid below
+# Details can be found here: https://core.telegram.org/bots 
 
-token='583669346:AAGuos_nrvBQfVBWaoPrz6v6Tmk2N0y0uW8'
-chatid = 425596683
+token='XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+chatid = 999999999
 
 # whois list of fields to send in alert msg
 
