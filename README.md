@@ -1,5 +1,6 @@
 # Fail2Ban-and-Telgram
-# DDOS and Bruteforce prevention and Telegram notifications
+
+DDOS and Bruteforce prevention using Fail2Ban and a python Telegram bot for notifications
 
 
  Configured several rules in Fail2Ban which check some application logs for certain REGEXs, which represent logged failed attempts, and bans the respective IPs upon match.
