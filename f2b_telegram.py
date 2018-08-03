@@ -55,6 +55,10 @@ ip = args.ip[0]
 name = args.name[0].upper()
 failed = args.failures[0]
 
+# get PID of fail2ban server for the log
+
+pid_no = sp.check_output(['pgrep', '-o', 'fail2ban-server']).split('\n')[0]
+
 # get hostname for alert message
 
 host = gethostname().upper()
@@ -107,7 +111,6 @@ def send_alert(token, chatid):
 try:
 	info = whois(ip, fields)
 	send_alert(token, chatid)
-	pid_no = sp.check_output(['pgrep', '-o', 'fail2ban-server']).split('\n')[0]
 	log.info("Alert sent successfully via Telegram.", extra={'pid': '[%s]:' % pid_no})
 except TelegramError as tg_err:
 	log.error("Unable to send alert, Telegram error: %s" % tg_err, extra={'pid': '[%s]:' % pid_no})
