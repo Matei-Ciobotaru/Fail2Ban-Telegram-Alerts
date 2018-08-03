@@ -19,17 +19,29 @@ from telegram.error import TelegramError
 import warnings
 from ipwhois import IPWhois
 from socket import gethostname
+import logging as log
+import subprocess as sp
+
+# Enable logging
+
+log_file = '/var/log/fail2ban.log'
+
+# Match Fail2Ban log format
+
+log.basicConfig(filename=log_file,
+                format='%(asctime)s fail2ban.telegram %(pid)14s %(levelname)-7s %(message)s',level=log.INFO)
 
 # set arguments for Fail2Ban variables
 
-parser = argparse.ArgumentParser(description = 'This script is used to send Telegram' \
-											   ' notifications when a Fail2Ban rule is triggered.')
+parser = argparse.ArgumentParser(description = 'This script is used to send Telegram ' \
+										       'notifications when a Fail2Ban rule is triggered.')
+
 parser.add_argument('-i', '--ip', type=str, nargs=1,
-					help='Enter the IP addr. of the attacker.', required=True)
+								  help='Enter the IP addr. of the attacker.', required=True)
 parser.add_argument('-n', '--name', type=str, nargs=1,
-                    help='Enter the name of the fail2ban rule triggered.', required=True)
+                                    help='Enter the name of the fail2ban rule triggered.', required=True)
 parser.add_argument('-f', '--failures', type=int, nargs=1, 
-					help='Enter the number of failed attempts.', required=True)
+										help='Enter the number of failed attempts.', required=True)
 args=None
 
 try:
@@ -47,7 +59,8 @@ failed = args.failures[0]
 
 host = gethostname().upper()
 
-# Telegram bot details, add your token & chatid below
+# IntruderAlertBot details 
+# Enter your Telegram token and chatid details here
 # Details can be found here: https://core.telegram.org/bots 
 
 token='XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
@@ -85,15 +98,18 @@ def send_alert(token, chatid):
 # Send static message if certain Fail2ban rule is triggered
 
 	bot.sendMessage(chat_id=ID, parse_mode='Markdown', text='Host *%s*:\n\nThe IP *%s* has just been banned by ' \
-			                                 	'Fail2ban after *%d* attempts against *%s*.\n' \
-								'*IP info:*\n\n%s' % (host, ip, failed, name, info))
+			                        						'Fail2ban after *%d* attempts against *%s*.\n' \
+															'*IP info:*\n\n%s' % (host, ip, failed, name, info))
 
 # Error Handling
+# Log directly fo Fail2Ban server log
 
 try:
-    info = whois(ip, fields)
-    send_alert(token, chatid)
+	info = whois(ip, fields)
+	send_alert(token, chatid)
+	pid_no = sp.check_output(['pgrep', '-o', 'fail2ban-server']).split('\n')[0]
+	log.info("Alert sent successfully via Telegram.", extra={'pid': '[%s]:' % pid_no})
 except TelegramError as tg_err:
-    print("ERROR: Unable to send Telegram message: %s" % tg_err)
+	log.error("Unable to send alert, Telegram error: %s" % tg_err, extra={'pid': '[%s]:' % pid_no})
 except Exception as err:
-    print("ERROR: %s " % err)
+	log.error("Unable to send alert via Telegram: %s " % err, extra={'pid': '[%s]:' % pid_no})

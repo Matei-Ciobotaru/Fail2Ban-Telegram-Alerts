@@ -1,0 +1,4 @@
+2018-08-02 13:03:05,018 fail2ban.actions        [22919]: NOTICE  [apache-noscript] Ban 203.148.249.175
+2018-08-02 13:03:06,521 fail2ban.telegram       [22919]: INFO    Alert sent successfully via Telegram.
+2018-08-02 13:03:06,670 fail2ban.actions        [22919]: NOTICE  [apache-noscript] Ban 212.129.57.27
+2018-08-02 13:03:08,436 fail2ban.telegram       [22919]: INFO    Alert sent successfully via Telegram.
