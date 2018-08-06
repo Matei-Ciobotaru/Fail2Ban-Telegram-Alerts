@@ -34,14 +34,14 @@ log.basicConfig(filename=log_file,
 # set arguments for Fail2Ban variables
 
 parser = argparse.ArgumentParser(description = 'This script is used to send Telegram ' \
-						'notifications when a Fail2Ban rule is triggered.')
+										       'notifications when a Fail2Ban rule is triggered.')
 
 parser.add_argument('-i', '--ip', type=str, nargs=1,
-				  help='Enter the IP addr. of the attacker.', required=True)
+								  help='Enter the IP addr. of the attacker.', required=True)
 parser.add_argument('-n', '--name', type=str, nargs=1,
                                     help='Enter the name of the fail2ban rule triggered.', required=True)
 parser.add_argument('-f', '--failures', type=int, nargs=1, 
-					help='Enter the number of failed attempts.', required=True)
+										help='Enter the number of failed attempts.', required=True)
 args=None
 
 try:
@@ -55,7 +55,7 @@ ip = args.ip[0]
 name = args.name[0].upper()
 failed = args.failures[0]
 
-# get PID of fail2ban server for the log
+# get fai2ban server PID for log
 
 pid_no = sp.check_output(['pgrep', '-o', 'fail2ban-server']).split('\n')[0]
 
@@ -64,11 +64,9 @@ pid_no = sp.check_output(['pgrep', '-o', 'fail2ban-server']).split('\n')[0]
 host = gethostname().upper()
 
 # IntruderAlertBot details 
-# Enter your Telegram token and chatid details here
-# Details can be found here: https://core.telegram.org/bots 
 
-token='XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-chatid = 999999999
+token='583669346:AAGuos_nrvBQfVBWaoPrz6v6Tmk2N0y0uW8'
+chatid = 425596683
 
 # whois list of fields to send in alert msg
 
@@ -84,11 +82,11 @@ def whois(ip, fields):
 	   		 warnings.filterwarnings("ignore", category=UserWarning)
 			 info = IPWhois(ip).lookup_whois()['nets'][0]
 			 for i in fields:
-				msg.append('*' + i.title() + '*: ' + str(info[i]).translate(None, '[]\''))
+				msg.append('<b>' + i.title() + '</b>: ' + str(info[i]).translate(None, '[]\''))
 				
 		return '\n'.join(msg)
 	except Exception as err:
-		msg_err = '*Issue with IPWhois*:\n%s' % err
+		msg_err = '<b>Issue with IPWhois</b>:\n%s' % err
 		return msg_err
 
 # Connect to Telegram bot
@@ -101,9 +99,9 @@ def send_alert(token, chatid):
 
 # Send static message if certain Fail2ban rule is triggered
 
-	bot.sendMessage(chat_id=ID, parse_mode='Markdown', text='Host *%s*:\n\nThe IP *%s* has just been banned by ' \
-			                			'Fail2ban after *%d* attempts against *%s*.\n' \
-								'*IP info:*\n\n%s' % (host, ip, failed, name, info))
+	bot.sendMessage(chat_id=ID, parse_mode='HTML', text='Host <b>%s</b>:\n\nThe IP <b>%s</b> has just been banned by ' \
+			                        					'Fail2ban after <b>%d</b> attempts against <b>%s</b>.\n' \
+														'<b>IP info:</b>\n\n%s' % (host, ip, failed, name, info))
 
 # Error Handling
 # Log directly fo Fail2Ban server log
