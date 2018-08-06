@@ -34,14 +34,14 @@ log.basicConfig(filename=log_file,
 # set arguments for Fail2Ban variables
 
 parser = argparse.ArgumentParser(description = 'This script is used to send Telegram ' \
-										       'notifications when a Fail2Ban rule is triggered.')
+						'notifications when a Fail2Ban rule is triggered.')
 
 parser.add_argument('-i', '--ip', type=str, nargs=1,
-								  help='Enter the IP addr. of the attacker.', required=True)
+				  help='Enter the IP addr. of the attacker.', required=True)
 parser.add_argument('-n', '--name', type=str, nargs=1,
                                     help='Enter the name of the fail2ban rule triggered.', required=True)
 parser.add_argument('-f', '--failures', type=int, nargs=1, 
-										help='Enter the number of failed attempts.', required=True)
+					help='Enter the number of failed attempts.', required=True)
 args=None
 
 try:
@@ -100,8 +100,8 @@ def send_alert(token, chatid):
 # Send static message if certain Fail2ban rule is triggered
 
 	bot.sendMessage(chat_id=ID, parse_mode='HTML', text='Host <b>%s</b>:\n\nThe IP <b>%s</b> has just been banned by ' \
-			                        					'Fail2ban after <b>%d</b> attempts against <b>%s</b>.\n' \
-														'<b>IP info:</b>\n\n%s' % (host, ip, failed, name, info))
+			                        	    'Fail2ban after <b>%d</b> attempts against <b>%s</b>.\n' \
+							    '<b>IP info:</b>\n\n%s' % (host, ip, failed, name, info))
 
 # Error Handling
 # Log directly fo Fail2Ban server log
