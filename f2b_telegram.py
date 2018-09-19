@@ -65,8 +65,8 @@ host = gethostname().upper()
 
 # IntruderAlertBot details 
 
-token='583669346:AAGuos_nrvBQfVBWaoPrz6v6Tmk2N0y0uW8'
-chatid = 425596683
+token='555555555:ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ'
+chatid = 555555555
 
 # whois list of fields to send in alert msg
 
