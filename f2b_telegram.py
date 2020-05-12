@@ -33,7 +33,7 @@ LOG_FILE = '/var/log/fail2ban.log'
 # Match Fail2Ban logging format
 logging.basicConfig(filename=LOG_FILE,
                     format='%(asctime)s fail2ban.telegram       ' \
-					'[%(process)s]: %(levelname)-7s %(message)s',
+                           '[%(process)s]: %(levelname)-7s %(message)s',
                     level=logging.INFO)
 
 
