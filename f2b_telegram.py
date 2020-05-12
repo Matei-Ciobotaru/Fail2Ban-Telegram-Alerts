@@ -26,7 +26,6 @@ from telegram.error import TelegramError
 BOT_TOKEN = 'YOUR_SECRET_BOT_TOKEN'
 CHAT_ID = 'YOUR_SECRET_CHAT_ID'
 
-
 # Enable logging
 LOG_FILE = '/var/log/fail2ban.log'
 
