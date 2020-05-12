@@ -42,7 +42,7 @@ def get_args():
     """
 
     parser = argparse.ArgumentParser(description='This script is used to send ' \
-						                         'Telegram notifications when ' \
+                                                 'Telegram notifications when ' \
                                                  'a Fail2Ban rule is triggered.')
 
     parser.add_argument('-i', '--ip', type=str,
@@ -123,8 +123,7 @@ def send_alert(token, chatid, message):
         bot.send_message(chat_id=chatid, parse_mode='HTML', text=message)
         logging.info('Alert sent successfully via Telegram.')
     except TelegramError as tg_err:
-        logging.error('Unable to send alert,' \
-                      'Telegram exception: %s', tg_err)
+        logging.error('Unable to send alert, Telegram exception: %s', tg_err)
 
 
 def main():
