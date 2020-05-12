@@ -1,116 +1,143 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3
 
 # -*- coding: utf-8 -*- #
 
-# Author = Matei Ciobotaru
 
 """
 
-     This script is used to send 
-    Telegram notifications along 
-    with IP details when certain 
-    Fail2Ban rules are triggered
+ This script is used to send Telegram notifications
+ along with IP details when certain Fail2Ban rules
+ are triggered
+
+ Author: Matei Ciobotaru
+
 
 """
 
+import logging
 import argparse
+from socket import gethostname
+import ipwhois
 from telegram.bot import Bot
 from telegram.error import TelegramError
-import warnings
-from ipwhois import IPWhois
-from socket import gethostname
-import logging as log
-import subprocess as sp
+
+
+# Telegram bot information
+BOT_TOKEN = 'YOUR_SECRET_BOT_TOKEN'
+CHAT_ID = 'YOUR_SECRET_CHAT_ID'
+
 
 # Enable logging
+LOG_FILE = '/var/log/fail2ban.log'
 
-log_file = '/var/log/fail2ban.log'
+# Match Fail2Ban logging format
+logging.basicConfig(filename=LOG_FILE,
+                    format='%(asctime)s fail2ban.telegram       ' \
+					'[%(process)s]: %(levelname)-7s %(message)s',
+                    level=logging.INFO)
 
-# Match Fail2Ban log format
 
-log.basicConfig(filename=log_file,
-                format='%(asctime)s fail2ban.telegram %(pid)14s %(levelname)-7s %(message)s',level=log.INFO)
+def get_args():
+    """
+    Get Fail2Ban info as script arguments
+    """
 
-# set arguments for Fail2Ban variables
+    parser = argparse.ArgumentParser(description='This script is used to send ' \
+						                         'Telegram notifications when ' \
+                                                 'a Fail2Ban rule is triggered.')
 
-parser = argparse.ArgumentParser(description = 'This script is used to send Telegram ' \
-						'notifications when a Fail2Ban rule is triggered.')
+    parser.add_argument('-i', '--ip', type=str,
+                        help='The IP address of the client.',
+                        required=True)
+    parser.add_argument('-n', '--name', type=str,
+                        help='The name of the Fail2Ban rule.',
+                        required=True)
+    parser.add_argument('-f', '--failures', type=int,
+                        help='The number of failed attempts.',
+                        required=True)
 
-parser.add_argument('-i', '--ip', type=str, nargs=1,
-				  help='Enter the IP addr. of the attacker.', required=True)
-parser.add_argument('-n', '--name', type=str, nargs=1,
-                                    help='Enter the name of the fail2ban rule triggered.', required=True)
-parser.add_argument('-f', '--failures', type=int, nargs=1, 
-					help='Enter the number of failed attempts.', required=True)
-args=None
+    try:
+        args = parser.parse_args()
+    except argparse.ArgumentError as arg_err:
+        parser.print_help()
+        logging.error('Unable to send alert,' \
+                      'Fail2Ban argument exception: %s', arg_err)
 
-try:
-	args = parser.parse_args()
-except Exception as err:
-	parser.print_help(); print err
+    return args
 
-# clean args
 
-ip = args.ip[0]
-name = args.name[0].upper()
-failed = args.failures[0]
 
-# get fai2ban server PID for log
+def get_ip_info(ip_addr):
+    """
+    Get WHOIS information about the IP adresss
+    """
 
-pid_no = sp.check_output(['pgrep', '-o', 'fail2ban-server']).split('\n')[0]
 
-# get hostname for alert message
+    ip_info = {}
+    fields = ['range', 'name', 'country', 'description', 'emails']
 
-host = gethostname().upper()
+    try:
+        info = ipwhois.IPWhois(ip_addr).lookup_whois()
 
-# IntruderAlertBot details 
+        for field in fields:
+            value = info['nets'][0].get(field, 'N/A')
+            ip_info[field] = value
 
-token='555555555:ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ'
-chatid = 555555555
+    except ipwhois.BaseIpwhoisException as ip_err:
+        ip_info['error'] = 'Unable to get IP details ({0})'.format(ip_err)
 
-# whois list of fields to send in alert msg
+    return ip_info
 
-fields = ['range', 'name', 'country', 'description', 'emails']
 
-# Find out IP details and store in dictionary for safe keeping
+def alert_message(ip_addr, rule_name, failures, ip_info):
+    """
+    Create Telegram alert message
+    """
 
-def whois(ip, fields):
 
-	msg = []
-	try:
-		with warnings.catch_warnings():
-	   		 warnings.filterwarnings("ignore", category=UserWarning)
-			 info = IPWhois(ip).lookup_whois()['nets'][0]
-			 for i in fields:
-				msg.append('<b>' + i.title() + '</b>: ' + str(info[i]).translate(None, '[]\''))
-				
-		return '\n'.join(msg)
-	except Exception as err:
-		msg_err = '<b>Issue with IPWhois</b>:\n%s' % err
-		return msg_err
+    host_name = gethostname()
+    header = 'Host: <b>{0}</b>\n\n'.format(host_name.upper())
 
-# Connect to Telegram bot
+    description = 'IP <b>{0}</b> has been banned by ' \
+                  'Fail2Ban after <b>{1}</b> failed ' \
+                  'attempts against "<b>{2}</b>".\n\n'.format(ip_addr, failures, rule_name.upper())
 
-def send_alert(token, chatid):
+    message = header + description
 
-	bot = Bot(token=token)
+    for key, value in ip_info.items():
 
-	ID = chatid
+        if isinstance(value, list):
+            value = ', '.join(value)
 
-# Send static message if certain Fail2ban rule is triggered
+        message += '<b>{0}:</b> {1}\n'.format(key.title(), value)
 
-	bot.sendMessage(chat_id=ID, parse_mode='HTML', text='Host <b>%s</b>:\n\nThe IP <b>%s</b> has just been banned by ' \
-			                        	    'Fail2ban after <b>%d</b> attempts against <b>%s</b>.\n' \
-							    '<b>IP info:</b>\n\n%s' % (host, ip, failed, name, info))
+    return message
 
-# Error Handling
-# Log directly fo Fail2Ban server log
 
-try:
-	info = whois(ip, fields)
-	send_alert(token, chatid)
-	log.info("Alert sent successfully via Telegram.", extra={'pid': '[%s]:' % pid_no})
-except TelegramError as tg_err:
-	log.error("Unable to send alert, Telegram error: %s" % tg_err, extra={'pid': '[%s]:' % pid_no})
-except Exception as err:
-	log.error("Unable to send alert via Telegram: %s " % err, extra={'pid': '[%s]:' % pid_no})
+def send_alert(token, chatid, message):
+    """
+    Send Telegram alert message
+    """
+
+    try:
+        bot = Bot(token=token)
+        bot.send_message(chat_id=chatid, parse_mode='HTML', text=message)
+        logging.info('Alert sent successfully via Telegram.')
+    except TelegramError as tg_err:
+        logging.error('Unable to send alert,' \
+                      'Telegram exception: %s', tg_err)
+
+
+def main():
+    """
+    Execute script
+    """
+
+    args = get_args()
+    ip_info = get_ip_info(args.ip)
+    message = alert_message(args.ip, args.name, args.failures, ip_info)
+    send_alert(BOT_TOKEN, CHAT_ID, message)
+
+
+if __name__ == '__main__':
+    main()

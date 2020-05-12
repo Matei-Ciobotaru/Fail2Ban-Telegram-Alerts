@@ -23,7 +23,7 @@ action = %(action_tg)s
 [sshd]				# SSH fail2ban rule
 
 enabled = true			# activate rule
-port    = XXYY			# other than 22, edited out (Use 'nmap' if you're curious)
+port    = 22
 logpath = /var/log/auth.log 	# log to check
 backend = %(sshd_backend)s
 filter = sshd
@@ -37,7 +37,7 @@ bantime = -1			# ban permanently
 # in the body.
 
 enabled = true
-port    = 2727
+port    = 22
 logpath = /var/log/auth.log
 backend = %(sshd_backend)s
 maxretry = 3
