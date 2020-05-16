@@ -40,3 +40,7 @@
 **fail2ban.log**<br>
 
  An extract of Fail2ban's log containing some Telegram alert entries.
+
+## Example Telegram alert
+
+<img src="https://i.imgur.com/4lBCaUp.jpg" height="700" width="350">
