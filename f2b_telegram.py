@@ -68,7 +68,6 @@ def get_ip_info(ip_addr):
     Get WHOIS information about the IP adresss
     """
 
-
     ip_info = {}
     fields = ['range', 'name', 'country', 'description', 'emails']
 
@@ -89,7 +88,6 @@ def alert_message(ip_addr, rule_name, failures, ip_info):
     """
     Create Telegram alert message
     """
-
 
     host_name = gethostname()
     header = 'Host: <b>{0}</b>\n\n'.format(host_name.upper())
