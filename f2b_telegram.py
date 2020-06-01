@@ -62,7 +62,6 @@ def get_args():
     return args
 
 
-
 def get_ip_info(ip_addr):
     """
     Get WHOIS information about the IP adresss
