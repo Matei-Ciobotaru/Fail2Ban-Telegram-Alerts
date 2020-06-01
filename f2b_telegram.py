@@ -9,7 +9,6 @@
 
  Author: Matei Ciobotaru
 
-
 """
 
 import logging
