@@ -1,11 +1,14 @@
 # Sending Fail2Ban alerts via Telegram
 
- A simple python 2.7 script I wrote so I may send [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) alerts via Telegram.
+ A simple python script I wrote so I may send [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) alerts via Telegram.
 
 ## Python Libraries
 
  You will require the [python-telegram-bot](https://python-telegram-bot.org/) library to use Telegram and the [ipwhois](https://pypi.org/project/ipwhois/) library to query details of the IP.
- All the other libraries used in the script are standard.
+
+  ```bash
+     # pip install python-telegram-bot ipwhois
+  ```
 
 ## Telegram Bot
 
@@ -15,7 +18,7 @@
 
 ## Scripts and configuration files
 
-**f2b_2_telegram.py**<br>
+**fail2ban_alert.py**<br>
 
 
  This Python script sends a notification via Telegram containing the banned IP address, the service name and some information gathered from “whois” on that IP.
@@ -24,17 +27,18 @@
 
  Based on the supplied IP address, it also performes a whois query and grabs some additional information like ip address range, issuer name, country of origin, description and abuse emails which is included in the Telegram notification message.
 
- It writes its output in Fail2Ban's default log ('/var/log/fail2ban.log') using the "fail2ban.telegram" tag and the same format for debugging purposes.
+ It writes its output in Fail2Ban's default log (`/var/log/fail2ban.log`) using the "fail2ban.telegram" tag and the same format for debugging purposes.
 
 
 **jail.local**<br>
 
- This is an extract from my Fail2Ban configuration file, which shows how to set Telegram alerts for a service.
+ This is an extract of a Fail2Ban configuration file, which shows how to set Telegram alert action for a service.
+ The file should be created in `/etc/fail2ban/jail.d/jail.local`
 
 
 **telegram.conf**<br>
 
- The python script must be specified in a separate "action" file ending in '.conf', located in the '/etc/fail2ban/action.d/' directory.
+ The python script must be specified in a separate "action" file ending in '.conf', located in the `/etc/fail2ban/action.d/` directory.
 
 
 **fail2ban.log**<br>
