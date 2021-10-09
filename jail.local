@@ -1,63 +1,44 @@
-### Edited out for brevity ###
+# Sample jail.local config
+[DEFAULT]
 
-
-[ ... ]
-
-
+ignoreip = 127.0.0.1/24
+bantime = 86400
+findtime = 300
+maxretry = 3
+banaction = iptables-multiport
+backend = systemd
 # Action to ban using IP tables and send telegram notification
-
-
 action_tg = %(banaction)s[name=%(__name__)s, bantime="%(bantime)s", port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
             telegram[name=%(__name__)s]
-
-
-# Choose default action.  To change, just override value of 'action' with the
-# interpolation to the chosen action shortcut (e.g.  action_mw, action_mwl, etc) in jail.local
-# globally (section [DEFAULT]) or per specific section
-
+# Choose default action.
 action = %(action_tg)s
 
-[ ... ]
+# SSH jail
+[sshd]
 
-
-[sshd]				# SSH fail2ban rule
-
-enabled = true			# activate rule
-port    = 22
-logpath = /var/log/auth.log 	# log to check
-backend = %(sshd_backend)s
-filter = sshd
-maxretry = 3  			# 3 maximum failed attempts
-bantime = -1			# ban permanently
-
-
-[sshd-ddos]
-# This jail corresponds to the standard configuration in Fail2ban.
-# The mail-whois action send a notification e-mail with a whois request
-# in the body.
-
-enabled = true
+enabled = tru
 port    = 22
 logpath = /var/log/auth.log
 backend = %(sshd_backend)s
+filter = sshd
 maxretry = 3
 bantime = -1
 
-# other rules 
 
-[...]
-
-# Nextcloud custom rule
-
-[nextcloud]
+# Apache2 auth jail
+[apache-auth]
 
 enabled = true
-port = http,https
-filter = nextcloud
-logpath = /var/log/nextcloud.log
-bantime = 7200
+port     = http,https
+logpath  = /var/log/apache2/error.log
+filter = apache-auth
 maxretry = 3
 
-# other stuff
+# Apache2 pass jail
+[apache-pass]
 
-[ ... ]
+enabled = true
+port    = http,https
+logpath  = /var/log/apache2/access.log
+filter = apache-pass
+maxretry = 3
