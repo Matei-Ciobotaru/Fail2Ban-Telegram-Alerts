@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# -*- coding: utf-8 -*- #
+# -*- coding: utf-8 -*-
 
 """
 
@@ -8,6 +8,7 @@
  are triggered
 
  Author: Matei Ciobotaru
+ Rewrited by: Eduard Gubaidullin
 
 """
 
@@ -15,13 +16,13 @@ import logging
 import argparse
 from socket import gethostname
 import ipwhois
-from telegram.bot import Bot
+from telegram import Bot
 from telegram.error import TelegramError
-
+from telegram import constants
 
 # Telegram bot information
 BOT_TOKEN = 'YOUR_SECRET_BOT_TOKEN'
-CHAT_ID = 'YOUR_SECRET_CHAT_ID'
+CHAT_ID = 'YOUR_SECRET_CHAT_ID''
 
 # Enable logging
 LOG_FILE = '/var/log/fail2ban.log'
@@ -64,7 +65,7 @@ def get_args():
 
 def get_ip_info(ip_addr):
     """
-    Get WHOIS information about the IP adresss
+    Get WHOIS information about the IP address
     """
 
     ip_info = {}
@@ -106,30 +107,29 @@ def alert_message(ip_addr, rule_name, failures, ip_info):
 
     return message
 
-
-def send_alert(token, chatid, message):
+async def send_alert(token, chatid, message):
     """
-    Send Telegram alert message
+    Send Telegram alert message asynchronously
     """
 
     try:
         bot = Bot(token=token)
-        bot.send_message(chat_id=chatid, parse_mode='HTML', text=message)
+        await bot.send_message(chat_id=chatid, parse_mode='HTML', text=message)
         logging.info('Alert sent successfully via Telegram.')
     except TelegramError as tg_err:
         logging.error('Unable to send alert, Telegram exception: %s', tg_err)
 
-
-def main():
+async def main():
     """
-    Execute script
+    Execute script asynchronously
     """
 
     args = get_args()
     ip_info = get_ip_info(args.ip)
     message = alert_message(args.ip, args.name, args.failures, ip_info)
-    send_alert(BOT_TOKEN, CHAT_ID, message)
 
+    await send_alert(BOT_TOKEN, CHAT_ID, message)
 
 if __name__ == '__main__':
-    main()
+    import asyncio
+    asyncio.run(main())
