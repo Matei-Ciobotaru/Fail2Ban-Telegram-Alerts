@@ -54,10 +54,10 @@ pip install python-telegram-bot ipwhois
 ## Testing
   You can test the script by running the following command with sample values:
   
-## Example Telegram alert
 ```bash
 python3.10 fail2ban_alert.py -i xxx.xxx.xxx.xxx -n SSH_BruteForce -f 5
 ```
   Replace the values with your desired IP address, rule name, and number of failed attempts to simulate the execution of the script.
-
+  
+## Example Telegram alert
 <img src="https://i.imgur.com/4lBCaUp.jpg" height="700" width="350">
