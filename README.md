@@ -1,18 +1,24 @@
 # Sending Fail2Ban alerts via Telegram
 
- A simple python script I wrote so I may send [Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page) alerts via Telegram.
+This is an updated version of the original script created by Matei Ciobotaru, with changes made by Gubaidullin Eduard. The script is designed to send Fail2Ban alerts via Telegram, providing information about banned IP addresses and relevant details.
 
 ## Python Libraries
 
- You will require the [python-telegram-bot](https://python-telegram-bot.org/) library to use Telegram and the [ipwhois](https://pypi.org/project/ipwhois/) library to query details of the IP.
+You will need the following Python libraries installed to use this script:
 
-  ```bash
-     # pip install python-telegram-bot ipwhois
-  ```
+- [python-telegram-bot](https://python-telegram-bot.org/) - Used to interact with Telegram.
+- [ipwhois](https://pypi.org/project/ipwhois/) - Used to query IP details.
+
+You can install the required libraries using the following command:
+
+```bash
+pip install python-telegram-bot ipwhois
+```
 
 ## Telegram Bot
 
  You will need to create a Telegram bot and edit the python script to add your personal token and chatid.
+ Edit the fail2ban_alert.py script and replace YOUR_SECRET_BOT_TOKEN and YOUR_SECRET_CHAT_ID with your actual bot token and chat ID.
 
  Details on how to create a bot [here](https://core.telegram.org/bots#creating-a-new-bot).
 
@@ -45,6 +51,13 @@
 
  An extract of Fail2ban's log containing some Telegram alert entries.
 
+## Testing
+  You can test the script by running the following command with sample values:
+  
 ## Example Telegram alert
+```bash
+python3.10 fail2ban_alert.py -i xxx.xxx.xxx.xxx -n SSH_BruteForce -f 5
+```
+  Replace the values with your desired IP address, rule name, and number of failed attempts to simulate the execution of the script.
 
 <img src="https://i.imgur.com/4lBCaUp.jpg" height="700" width="350">
