@@ -12,6 +12,8 @@ action_tg = %(banaction)s[name=%(__name__)s, bantime="%(bantime)s", port="%(port
             telegram[name=%(__name__)s]
 # Choose default action.
 action = %(action_tg)s
+# if you are going to use ufw
+# action = ufw %(action_tg)s
 
 # SSH jail
 [sshd]
